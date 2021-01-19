@@ -42,15 +42,24 @@ def main():
 
     readEmails(service)
 
-
+def getUserInput(name):
+    val = None
+    while val != "exit" and not val:
+        print("Enter "+name+" or exit")
+        val = input()
+    if val == "exit":
+        sys.exit()
+    
+    return val
 
 def readEmails(service, user_id='me'):
     print ("start readEmails")
     page_token = None
-    res=[]
     i=0
-    while True:  #page token == 
-        threadList = service.users().threads().list(userId=user_id,maxResults=500,pageToken=page_token).execute()
+    runName = getUserInput("runName")
+    while True:  #page token
+        res=[]
+        threadList = service.users().threads().list(userId=user_id,maxResults=10,pageToken=page_token).execute()
         for thread in threadList.get('threads'): #loop through all threads
             i+=1
             print("email ",i) 
@@ -66,31 +75,33 @@ def readEmails(service, user_id='me'):
                         _from = header['value']
                     elif header['name'] == 'To':
                         _to = header['value']
-                res += [[_d,_from,_to]]
+                res += [[runName,_d,_from,_to]]
+        insertToDB(res)
         page_token = threadList.get('nextPageToken') # if not empty will be used to bring the next round
         if not page_token:
             break
 
+def insertToDB(tbl):
     full_db_name = os.path.join(os.getcwd(), 'QR-DB.db')
     conn = create_connection(full_db_name)
     if conn is None:
         print("Error! cannot create the database connection.")
     email_table_name = "QR_GMAIL "
-    sql_create_tbl = "CREATE TABLE IF NOT EXISTS "+ email_table_name +"(EMAIL_DATE TEXT, SENDER TEXT, RECIEVER TEXT);"
-    print (sql_create_tbl)
-    create_table(conn,sql_create_tbl)
-    print("table created")
+#    sql_create_tbl = "CREATE TABLE IF NOT EXISTS "+ email_table_name +"(RUN TEXT, EMAIL_DATE TEXT, SENDER TEXT, RECIEVER TEXT);"
+#    print (sql_create_tbl)
+#    create_table(conn,sql_create_tbl)
+#    print("table created")
     try:
         c = conn.cursor()
-        cmd = 'INSERT INTO '+email_table_name+' VALUES (?,?,?)'
+        cmd = 'INSERT INTO '+email_table_name+' VALUES (?,?,?,?)'
         print(cmd)
-        c.executemany (cmd,res)
+        c.executemany (cmd,tbl)
         conn.commit()
         conn.close()
     except Error as e:        
         print(traceback.format_exc())
 
-    print('done')
+    print('Inserted',len(tbl)," Rows !")
 
 if __name__ == '__main__':
     main()
