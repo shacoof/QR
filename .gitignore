@@ -16,9 +16,10 @@
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 
-
+*credentials*.json
 *.db
 *.csv
+*.xlsx
 *.log
 *.bck
 static/jquery.js
