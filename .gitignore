@@ -16,6 +16,7 @@
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 
+*.pickle
 *credentials*.json
 *.db
 *.csv
