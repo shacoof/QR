@@ -40,27 +40,33 @@ def initAPI():
     return creds
 
 
-def dbInsert(tbl):
+def dbInsert(tblName,tblData):
     full_db_name = os.path.join(os.getcwd(), 'QR-DB.db')
     conn = create_connection(full_db_name)
     if conn is None:
         print("Error! cannot create the database connection.")
-    email_table_name = "QR_GMAIL "
+    #email_table_name = "QR_GMAIL"
 #    sql_create_tbl = "CREATE TABLE IF NOT EXISTS "+ email_table_name +"(RUN TEXT, EMAIL_DATE TEXT, SENDER TEXT, RECIEVER TEXT);"
 #    print (sql_create_tbl)
 #    create_table(conn,sql_create_tbl)
 #    print("table created")
-    try:
+    try:        
+        #We deduce the number of fields in the table based on the number of items in each row
+        fields=''
+        for i in tblData[0]:
+            fields+="?,"
+        fields=fields[:len(fields)-1] #remove the redundant , (comma)
         c = conn.cursor()
-        cmd = 'INSERT INTO '+email_table_name+' VALUES (?,?,?,?)'
+        cmd = 'INSERT INTO '+tblName+' VALUES ('+fields+')'
         print(cmd)
-        c.executemany (cmd,tbl)
+        c.executemany (cmd,tblData)
         conn.commit()
         conn.close()
+        print('Inserted',len(tblData)," Rows !")
     except Error as e:        
         print(traceback.format_exc())
 
-    print('Inserted',len(tbl)," Rows !")
+    
 
 def getUserInput(name,defaultVal):
     val = defaultVal

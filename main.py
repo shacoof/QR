@@ -13,7 +13,7 @@ def main():
     if cmd == "e" or cmd == "B":
         readGmail(creds=creds,runName=runName, batchSize=batchSize)
     elif cmd == "c" or cmd == "B":
-        readCalender(creds=creds)
+        readCalender(creds=creds,runName=runName)
     
     
 if __name__ == '__main__':

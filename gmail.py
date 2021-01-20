@@ -36,7 +36,7 @@ def readGmail(creds,user_id='me',runName="temp", batchSize=10):
                     elif header['name'] == 'To':
                         _to = header['value']
                 res += [[runName,_d,_from,_to]]
-        dbInsert(res)
+        dbInsert("QR_GMAIL",res)
         page_token = threadList.get('nextPageToken') # if not empty will be used to bring the next round
         if not page_token:
             break
